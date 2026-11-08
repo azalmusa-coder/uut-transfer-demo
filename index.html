@@ -1,48 +1,34 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2563eb">
-<title>UUT Transfer Demo</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#eef2f7;color:#172337;font:16px system-ui,sans-serif}main{max-width:800px;margin:auto;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom))}h1{font-size:clamp(24px,5vw,32px);margin:14px 0 6px}h2{font-size:18px;margin-top:0}p{line-height:1.5}.badge{display:inline-block;background:#dbeafe;color:#174899;padding:8px 12px;border-radius:20px;font-size:12px}section{background:white;border:1px solid #dde4ee;border-radius:16px;padding:18px;margin:16px 0;min-width:0}label{display:block;font-size:14px;margin:12px 0 6px}input,select,button{font:inherit;min-height:48px;border-radius:9px}input,select{width:100%;min-width:0;padding:10px;border:1px solid #cbd5e1;background:white;color:inherit}button{border:1px solid #cbd5e1;background:white;padding:12px 16px;cursor:pointer;touch-action:manipulation}button:disabled{opacity:.5;cursor:wait}button.pressed,button:active{transform:translateY(1px);filter:brightness(.92)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2563eb;outline-offset:3px}.primary{background:#2563eb;color:white;border-color:#2563eb}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.path,.file{overflow-wrap:anywhere;background:#f3f6fa;padding:13px;border-radius:8px;font:14px/1.6 monospace}.actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}progress{width:100%;height:18px;accent-color:#2563eb}#log{font:13px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto}.muted{color:#526176;font-size:14px}dialog{border:0;border-radius:16px;padding:20px;width:calc(100% - 24px);max-width:520px;max-height:85vh;max-height:85dvh;overflow:auto}dialog::backdrop{background:#13243d99}.file{margin:12px 0}@media(max-width:560px){.grid{grid-template-columns:1fr}.actions button{flex:1 1 130px}main{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}section{padding:15px}}
-</style>
-</head>
-<body><main>
-<span class="badge">INTERACTIVE DEMO - SAMPLE DATA ONLY</span>
-<h1>UUT Log Transfer</h1><p>Edit sample values and test the transfer workflow. No Windows files are accessed or copied.</p>
-<section><h2>Source and destination</h2>
-<label for="workbook">Excel workbook (sample path only)</label><input id="workbook" value="C:&#92;LocalFolder&#92;UUT_Tracking.xlsx">
-<label for="sheet">Worksheet (sample)</label><input id="sheet" value="Sheet1">
-<label for="base">Destination folder (sample)</label><select id="base"><option value="&#92;&#92;fileserver&#92;engineering&#92;Test_Logs">Network test logs</option><option value="C:&#92;Projects&#92;UUT_Data">Local UUT data</option></select>
-</section>
-<section><h2>Editable sample data</h2><div class="grid">
-<div><label for="uut">UUT name</label><input id="uut" value="UUT-001"></div>
-<div><label for="ref">Refrigerant</label><input id="ref" value="R-454B"></div>
-<div><label for="unit">Unit type</label><input id="unit" value="Heat Pump"></div>
-<div><label for="model">Model family</label><input id="model" value="XYZ-Family"></div>
-</div><h3>Target folder</h3><div class="path" id="target"></div></section>
-<section><h2>Transfer</h2><p class="muted">Three simulated files, including one conflict.</p><div class="actions"><button id="reset" type="button">Reset</button><button id="start" type="button" class="primary">Start Copy Demo</button></div><p><progress id="progress" aria-label="Files processed" max="3" value="0"></progress></p><div id="status" role="status" aria-live="polite">Ready.</div></section>
-<section><h2>Activity</h2><div id="log" role="log" aria-live="polite">No files processed yet.</div></section>
-</main>
-<dialog id="conflict" aria-labelledby="conflict-title"><h2 id="conflict-title">Similar file found</h2><p>Choose how the demo should handle this conflict.</p><div class="file">Incoming: run2.csv<br>245.10 KB</div><div class="file">Existing: run2.csv<br>198.40 KB</div><div class="actions"><button type="button" data-choice="skip">Skip</button><button type="button" data-choice="keep">Keep Both</button><button type="button" class="primary" data-choice="overwrite">Overwrite</button></div></dialog>
+<html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'><title>UUT Transfer Demo</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#eef2f7;color:#172337;font:16px system-ui,sans-serif}main{max-width:800px;margin:auto;padding:16px}h1{font-size:26px;margin:12px 0 6px}h2{font-size:18px;margin:0 0 10px}p{line-height:1.5;color:#526176}section{background:#fff;border:1px solid #dde4ee;border-radius:16px;padding:16px;margin:14px 0}label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}input[type=text],select{width:100%;min-height:46px;padding:10px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}button{font:inherit;min-height:44px;border:1px solid #cbd5e1;background:#fff;border-radius:9px;padding:8px 14px;touch-action:manipulation}button:disabled{opacity:.5}button:active{filter:brightness(.9)}.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600}.badge{display:inline-block;background:#dbeafe;color:#174899;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700}.fold{border:1px solid #dde4ee;border-radius:12px;margin:10px 0;overflow:hidden}.fh{display:flex;align-items:center;gap:12px;padding:12px;background:#f6f8fb;min-height:50px;margin:0;font-size:16px}.fh input{width:22px;height:22px;flex:none}.fh span{flex:1;overflow-wrap:anywhere}.fh small{color:#64748b;font-weight:400}.body{padding:4px 12px 12px}.off .body{display:none}.uut{border-top:1px solid #e5eaf1;padding:8px 0}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.path{font:13px monospace;overflow-wrap:anywhere;padding:10px;border-radius:8px;margin-top:8px}.ok{background:#e8f5ec}.new{background:#fff4e0}.bad{background:#fde8e8}.path b{display:inline-block;font:700 11px system-ui;border-radius:10px;padding:3px 8px;margin-right:6px;background:#0001}.warn{color:#9a3412;font-size:13px;margin-top:6px}.note{color:#64748b;font-size:14px;padding:8px 0}.actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}progress{width:100%;height:16px;accent-color:#2563eb}#log{font:13px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto}@media(max-width:560px){.actions button{flex:1 1 120px}}</style></head>
+<body><main><span class='badge'>INTERACTIVE DEMO - SAMPLE DATA ONLY</span><h1>UUT Log Transfer</h1><p>Tick the test-lab folders to scan. Each Excel file is one UUT and gets its own folder: incident date, then model number. 5-digit model = R-410A, 6-digit model = R-454B. Nothing is really read or copied.</p>
+<section><h2>1. Source folders</h2><div id='folders'></div></section>
+<section><h2>2. Destination</h2><label for='base'>Base folder (sample)</label><select id='base'><option value='&#92;&#92;fileserver&#92;engineering&#92;Test_Logs'>&#92;&#92;fileserver&#92;engineering&#92;Test_Logs</option><option value='C:&#92;Projects&#92;UUT_Data'>C:&#92;Projects&#92;UUT_Data</option></select><p id='summary'></p></section>
+<section><h2>3. Transfer</h2><div class='actions'><button id='reset' type='button'>Reset</button><button id='start' class='primary' type='button'>Start Copy Demo</button></div><p><progress id='progress' max='1' value='0'></progress></p><div id='status' role='status'>Ready.</div><div id='log'>No files processed yet.</div></section></main>
 <script>
-'use strict';
-const el=id=>document.getElementById(id);
-let phase='idle';
-function clean(s){return s.trim().replace(/[^\w .-]/g,'_')||'Unknown'}
-function preview(){el('target').textContent=[el('base').value,...['ref','unit','model','uut'].map(id=>clean(el(id).value))].join(String.fromCharCode(92))}
-function log(text){el('log').textContent+='\n'+text;el('log').scrollTop=el('log').scrollHeight}
-function lock(value){document.querySelectorAll('main input,main select,main button').forEach(node=>node.disabled=value)}
-function start(){if(phase!=='idle')return;phase='copying';lock(true);el('progress').value=0;el('log').textContent='Starting simulated transfer...';el('status').textContent='Copying sample files...';setTimeout(()=>{log('Copied: run1.csv');el('progress').value=1;phase='conflict';el('status').textContent='Waiting for your decision.';el('conflict').showModal()},650)}
-function resolve(choice){if(phase!=='conflict')return;phase='finishing';el('conflict').close();log(choice==='skip'?'Skipped: run2.csv':choice==='keep'?'Copied as: run2_copy.csv':'Overwrote: run2.csv');el('progress').value=2;el('status').textContent='Finishing simulation...';setTimeout(()=>{log('Copied: run3.csv');el('progress').value=3;log('Simulation only - no real files changed.');el('status').textContent='Demo finished.';phase='idle';lock(false);el('start').focus()},650)}
-el('start').addEventListener('click',start);
-el('reset').addEventListener('click',()=>{if(phase!=='idle')return;el('progress').value=0;el('status').textContent='Ready.';el('log').textContent='No files processed yet.'});
-['uut','ref','unit','model'].forEach(id=>el(id).addEventListener('input',preview));el('base').addEventListener('change',preview);
-document.querySelectorAll('[data-choice]').forEach(button=>button.addEventListener('click',()=>resolve(button.dataset.choice)));
-el('conflict').addEventListener('cancel',event=>{event.preventDefault();resolve('skip')});
-// Pointer events provide touch/pen/mouse feedback; click alone performs actions.
-document.querySelectorAll('button').forEach(button=>{button.addEventListener('pointerdown',event=>{if(event.isPrimary&&!button.disabled)button.classList.add('pressed')});['pointerup','pointercancel','pointerleave','lostpointercapture','blur'].forEach(name=>button.addEventListener(name,()=>button.classList.remove('pressed')))});
-preview();
+const $=id=>document.getElementById(id),BS=String.fromCharCode(92),NL=String.fromCharCode(10),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const clean=s=>s.trim().replace(/[^A-Za-z0-9 ._-]/g,'_')||'Unknown';
+const SRC=[{f:'Lab_Run_A',on:1,other:2,x:[{n:'UUT_A.xlsx',d:'2026-11-03',m:'48213',r:'R-410A'}]},{f:'Lab_Run_B',on:1,other:3,x:[{n:'UUT_B.xlsx',d:'2026-11-04',m:'612345',r:'R-454B'},{n:'UUT_B2.xlsx',d:'2026-11-04',m:'612350',r:'R-454B'}]},{f:'Lab_Run_C',on:1,other:4,x:[]},{f:'Lab_Run_D',on:0,other:1,x:[{n:'UUT_D.xlsx',d:'2026-11-05',m:'61234',r:'R-454B'}]}];
+let busy=0;
+function existing(){const b=$('base').value,s=new Set();if(b.charAt(0)==='C')return s;s.add(b+BS+'2026-11-03');s.add(b+BS+'2026-11-03'+BS+'48213');return s}
+function mk(t,x,c){const e=document.createElement(t);if(x)e.textContent=x;if(c)e.className=c;return e}
+function refOf(m){return m.length===5?'R-410A':m.length===6?'R-454B':'unknown'}
+function check(u){const d=u.di.value.trim(),m=u.mi.value.trim();u.valid=/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(d)&&/^[0-9]{5,6}$/.test(m);u.dp=$('base').value+BS+clean(d)+BS+clean(m);const ex=existing(),dd=$('base').value+BS+clean(d);let tag,cls;if(!u.valid){tag='FIX DATE (YYYY-MM-DD) OR MODEL (5-6 digits)';cls='path bad'}else if(ex.has(u.dp)){tag='EXISTS';cls='path ok'}else{tag=ex.has(dd)?'WILL BE CREATED (date folder exists)':'WILL BE CREATED';cls='path new'}u.pe.className=cls;u.pe.textContent='';u.pe.append(mk('b',tag),document.createTextNode(u.dp));const r=refOf(m);u.we.textContent=u.valid&&r!==u.r?'Warning: '+m.length+'-digit model means '+r+', but the workbook says '+u.r+'.':(u.valid?'Refrigerant from model digits: '+r:'')}
+function summary(){let f=0,u=0,s=0;SRC.forEach(g=>{if(!g.on)return;f++;if(g.x.length)u+=g.x.length;else s++});$('summary').textContent=f+' folder(s) selected, '+u+' UUT workbook(s) found, '+s+' folder(s) with no Excel will be skipped.'}
+function build(){const box=$('folders');SRC.forEach(g=>{const w=mk('div','',g.on?'fold':'fold off'),h=mk('label','','fh'),c=mk('input');c.type='checkbox';c.checked=!!g.on;c.addEventListener('change',()=>{g.on=c.checked;w.className=g.on?'fold':'fold off';summary()});h.append(c,mk('span',g.f),mk('small',g.x.length+' Excel, '+g.other+' other'));const b=mk('div','','body');if(!g.x.length)b.append(mk('div','No Excel files in this folder - it will be skipped.','note'));g.x.forEach(u=>{const e=mk('div','','uut');e.append(mk('strong',u.n));const t=mk('div','','two'),a=mk('div'),m=mk('div');u.di=mk('input');u.di.type='text';u.di.value=u.d;u.mi=mk('input');u.mi.type='text';u.mi.value=u.m;u.mi.inputMode='numeric';a.append(mk('label','Incident date'),u.di);m.append(mk('label','Model number'),u.mi);t.append(a,m);u.pe=mk('div');u.we=mk('div','','warn');e.append(t,u.pe,u.we);b.append(e);const f=()=>check(u);u.di.addEventListener('input',f);u.mi.addEventListener('input',f)});w.append(h,b);box.append(w)});$('base').addEventListener('change',()=>SRC.forEach(g=>g.x.forEach(check)));SRC.forEach(g=>g.x.forEach(check));summary()}
+function log(t){$('log').textContent+=NL+t;$('log').scrollTop=1e6}
+function lock(v){busy=v;document.querySelectorAll('main input,main select,main button').forEach(e=>e.disabled=v)}
+async function run(){if(busy)return;const sel=SRC.filter(g=>g.on),all=[];sel.forEach(g=>g.x.forEach(u=>all.push(u)));
+if(!sel.length){$('status').textContent='Tick at least one folder first.';return}
+if(!all.length){$('status').textContent='No Excel files in the selected folders.';return}
+if(all.some(u=>!u.valid)){$('status').textContent='Fix the red items first.';return}
+lock(true);$('log').textContent='Starting simulated transfer...';$('progress').max=all.length;$('progress').value=0;const ex=existing();let k=0;
+for(const g of sel){if(!g.x.length){log('Skipped folder (no Excel): '+g.f);continue}
+for(const u of g.x){$('status').textContent='Processing '+u.n+'...';await sleep(450);const d=$('base').value+BS+clean(u.di.value),p=u.dp;
+if(!ex.has(d)){log('Created folder: '+d);ex.add(d)}if(!ex.has(p)){log('Created folder: '+p);ex.add(p)}else log('Using existing folder: '+p);
+log('Copied: '+g.f+'/'+u.n+(g.other?' + '+g.other+' other file(s)':'')+' -> '+p);$('progress').value=++k}}
+log('Simulation only - no real files changed.');$('status').textContent='Demo finished.';lock(false)}
+$('start').addEventListener('click',run);
+$('reset').addEventListener('click',()=>{if(busy)return;$('progress').value=0;$('status').textContent='Ready.';$('log').textContent='No files processed yet.'});
+build();
 </script></body></html>
