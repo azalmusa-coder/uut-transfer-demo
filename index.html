@@ -1,20 +1,48 @@
 <!doctype html>
-<html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>UUT Transfer Demo</title>
-<style>*{box-sizing:border-box}body{margin:0;background:#eef2f7;color:#172337;font:15px system-ui,sans-serif}main{max-width:760px;margin:auto;padding:16px}h1{margin:12px 0 6px;font-size:26px}p{line-height:1.5;color:#526176}.badge{display:inline-block;background:#dbeafe;color:#174899;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700}section{background:#fff;border:1px solid #dde4ee;border-radius:16px;padding:18px;margin:16px 0}h2{font-size:17px;margin:0 0 12px}label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}input,select,button{font:inherit;min-height:46px;border-radius:9px}input,select{width:100%;padding:10px;border:1px solid #cbd5e1;background:#fff;color:#172337}button{border:1px solid #cbd5e1;background:#fff;padding:10px 16px;cursor:pointer}button:disabled{opacity:.5}.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600}.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.path{font:13px monospace;overflow-wrap:anywhere;background:#f3f6fa;padding:13px;border-radius:8px;line-height:1.6}progress{width:100%;height:14px;accent-color:#2563eb}#log{font:12px/1.8 monospace;white-space:pre-wrap;min-height:90px;max-height:200px;overflow:auto;color:#334155}.muted{font-size:12px;color:#64748b}.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}dialog{border:0;border-radius:18px;padding:22px;width:calc(100% - 32px);max-width:520px}dialog::backdrop{background:#13243d88}.file{padding:14px;background:#f1f5f9;border-radius:10px;margin:10px 0;overflow-wrap:anywhere}@media(max-width:420px){.grid{grid-template-columns:1fr}}</style></head>
-<body><main><span class='badge'>INTERACTIVE DEMO - NO REAL FILE OPERATIONS</span><h1>UUT Log Transfer</h1><p>Edit the sample values, preview the target folder, and simulate a copy with a file conflict.</p>
-<section><h2>Source and destination</h2><label>Excel workbook (sample)</label><input value='C:&#92;LocalFolder&#92;UUT_Tracking.xlsx'><label>Worksheet</label><input value='Sheet1'><label>Destination folder (sample)</label><select id='base' onchange='preview()'><option value='&#92;&#92;fileserver&#92;engineering&#92;Test_Logs'>&#92;&#92;fileserver&#92;engineering&#92;Test_Logs</option><option value='C:&#92;Projects&#92;UUT_Data'>C:&#92;Projects&#92;UUT_Data</option></select></section>
-<section><h2>Excel preview (editable sample data)</h2><div class='grid'><div><label>UUT name</label><input id='uut' value='UUT-001' oninput='preview()'></div><div><label>Refrigerant</label><input id='ref' value='R-454B' oninput='preview()'></div><div><label>Unit type</label><input id='unit' value='Heat Pump' oninput='preview()'></div><div><label>Model family</label><input id='model' value='XYZ-Family' oninput='preview()'></div></div><label>Target folder</label><div class='path' id='target'></div></section>
-<section><h2>Transfer</h2><p class='muted'>Simulates 3 sample files, one of which conflicts. Nothing is copied.</p><div class='actions'><button id='reset' onclick='resetDemo()'>Reset</button><button id='start' class='primary' onclick='startDemo()'>Start Copy Demo</button></div><p><progress id='progress' max='3' value='0'></progress></p><div id='status' class='muted'>Ready.</div></section>
-<section><h2>Activity</h2><div id='log'>No files processed yet.</div></section></main>
-<dialog id='conflict'><h2>Similar file found</h2><div class='file'><strong>Incoming: run2.csv</strong><br>245.10 KB - modified Nov 7, 2:30 PM</div><div class='file'><strong>Existing: run2.csv</strong><br>198.40 KB - modified Nov 5, 10:01 AM</div><div class='actions'><button onclick="resolveConflict('skip')">Skip</button><button onclick="resolveConflict('keep')">Keep Both</button><button class='primary' onclick="resolveConflict('overwrite')">Overwrite</button></div></dialog>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<title>UUT Transfer Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef2f7;color:#172337;font:16px system-ui,sans-serif}main{max-width:800px;margin:auto;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom))}h1{font-size:clamp(24px,5vw,32px);margin:14px 0 6px}h2{font-size:18px;margin-top:0}p{line-height:1.5}.badge{display:inline-block;background:#dbeafe;color:#174899;padding:8px 12px;border-radius:20px;font-size:12px}section{background:white;border:1px solid #dde4ee;border-radius:16px;padding:18px;margin:16px 0;min-width:0}label{display:block;font-size:14px;margin:12px 0 6px}input,select,button{font:inherit;min-height:48px;border-radius:9px}input,select{width:100%;min-width:0;padding:10px;border:1px solid #cbd5e1;background:white;color:inherit}button{border:1px solid #cbd5e1;background:white;padding:12px 16px;cursor:pointer;touch-action:manipulation}button:disabled{opacity:.5;cursor:wait}button.pressed,button:active{transform:translateY(1px);filter:brightness(.92)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2563eb;outline-offset:3px}.primary{background:#2563eb;color:white;border-color:#2563eb}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.path,.file{overflow-wrap:anywhere;background:#f3f6fa;padding:13px;border-radius:8px;font:14px/1.6 monospace}.actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}progress{width:100%;height:18px;accent-color:#2563eb}#log{font:13px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto}.muted{color:#526176;font-size:14px}dialog{border:0;border-radius:16px;padding:20px;width:calc(100% - 24px);max-width:520px;max-height:85vh;max-height:85dvh;overflow:auto}dialog::backdrop{background:#13243d99}.file{margin:12px 0}@media(max-width:560px){.grid{grid-template-columns:1fr}.actions button{flex:1 1 130px}main{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}section{padding:15px}}
+</style>
+</head>
+<body><main>
+<span class="badge">INTERACTIVE DEMO - SAMPLE DATA ONLY</span>
+<h1>UUT Log Transfer</h1><p>Edit sample values and test the transfer workflow. No Windows files are accessed or copied.</p>
+<section><h2>Source and destination</h2>
+<label for="workbook">Excel workbook (sample path only)</label><input id="workbook" value="C:&#92;LocalFolder&#92;UUT_Tracking.xlsx">
+<label for="sheet">Worksheet (sample)</label><input id="sheet" value="Sheet1">
+<label for="base">Destination folder (sample)</label><select id="base"><option value="&#92;&#92;fileserver&#92;engineering&#92;Test_Logs">Network test logs</option><option value="C:&#92;Projects&#92;UUT_Data">Local UUT data</option></select>
+</section>
+<section><h2>Editable sample data</h2><div class="grid">
+<div><label for="uut">UUT name</label><input id="uut" value="UUT-001"></div>
+<div><label for="ref">Refrigerant</label><input id="ref" value="R-454B"></div>
+<div><label for="unit">Unit type</label><input id="unit" value="Heat Pump"></div>
+<div><label for="model">Model family</label><input id="model" value="XYZ-Family"></div>
+</div><h3>Target folder</h3><div class="path" id="target"></div></section>
+<section><h2>Transfer</h2><p class="muted">Three simulated files, including one conflict.</p><div class="actions"><button id="reset" type="button">Reset</button><button id="start" type="button" class="primary">Start Copy Demo</button></div><p><progress id="progress" aria-label="Files processed" max="3" value="0"></progress></p><div id="status" role="status" aria-live="polite">Ready.</div></section>
+<section><h2>Activity</h2><div id="log" role="log" aria-live="polite">No files processed yet.</div></section>
+</main>
+<dialog id="conflict" aria-labelledby="conflict-title"><h2 id="conflict-title">Similar file found</h2><p>Choose how the demo should handle this conflict.</p><div class="file">Incoming: run2.csv<br>245.10 KB</div><div class="file">Existing: run2.csv<br>198.40 KB</div><div class="actions"><button type="button" data-choice="skip">Skip</button><button type="button" data-choice="keep">Keep Both</button><button type="button" class="primary" data-choice="overwrite">Overwrite</button></div></dialog>
 <script>
-const el=id=>document.getElementById(id);const BS=String.fromCharCode(92);let busy=false;
+'use strict';
+const el=id=>document.getElementById(id);
+let phase='idle';
 function clean(s){return s.trim().replace(/[^\w .-]/g,'_')||'Unknown'}
-function preview(){el('target').textContent=[el('base').value].concat(['ref','unit','model','uut'].map(i=>clean(el(i).value))).join(BS)}
-function log(s){el('log').textContent+='\n'+s;el('log').scrollTop=el('log').scrollHeight}
-function setBusy(b){busy=b;el('start').disabled=b;el('reset').disabled=b}
-function startDemo(){if(busy)return;setBusy(true);el('log').textContent='Starting simulated transfer...';el('progress').value=0;el('status').textContent='Copying sample files...';setTimeout(()=>{log('Copied: run1.csv');el('progress').value=1;el('status').textContent='Waiting for your decision.';el('conflict').showModal()},650)}
-function resolveConflict(a){el('conflict').close();log(a==='skip'?'Skipped: run2.csv':a==='keep'?'Copied as: run2_copy.csv':'Overwrote: run2.csv');el('progress').value=2;setTimeout(()=>{log('Copied: run3.csv');el('progress').value=3;el('status').textContent='Demo finished.';log('Simulation only - no real files changed.');setBusy(false)},650)}
-function resetDemo(){if(busy)return;el('progress').value=0;el('log').textContent='No files processed yet.';el('status').textContent='Ready.'}
-el('conflict').addEventListener('cancel',e=>{e.preventDefault();resolveConflict('skip')});preview();
+function preview(){el('target').textContent=[el('base').value,...['ref','unit','model','uut'].map(id=>clean(el(id).value))].join(String.fromCharCode(92))}
+function log(text){el('log').textContent+='\n'+text;el('log').scrollTop=el('log').scrollHeight}
+function lock(value){document.querySelectorAll('main input,main select,main button').forEach(node=>node.disabled=value)}
+function start(){if(phase!=='idle')return;phase='copying';lock(true);el('progress').value=0;el('log').textContent='Starting simulated transfer...';el('status').textContent='Copying sample files...';setTimeout(()=>{log('Copied: run1.csv');el('progress').value=1;phase='conflict';el('status').textContent='Waiting for your decision.';el('conflict').showModal()},650)}
+function resolve(choice){if(phase!=='conflict')return;phase='finishing';el('conflict').close();log(choice==='skip'?'Skipped: run2.csv':choice==='keep'?'Copied as: run2_copy.csv':'Overwrote: run2.csv');el('progress').value=2;el('status').textContent='Finishing simulation...';setTimeout(()=>{log('Copied: run3.csv');el('progress').value=3;log('Simulation only - no real files changed.');el('status').textContent='Demo finished.';phase='idle';lock(false);el('start').focus()},650)}
+el('start').addEventListener('click',start);
+el('reset').addEventListener('click',()=>{if(phase!=='idle')return;el('progress').value=0;el('status').textContent='Ready.';el('log').textContent='No files processed yet.'});
+['uut','ref','unit','model'].forEach(id=>el(id).addEventListener('input',preview));el('base').addEventListener('change',preview);
+document.querySelectorAll('[data-choice]').forEach(button=>button.addEventListener('click',()=>resolve(button.dataset.choice)));
+el('conflict').addEventListener('cancel',event=>{event.preventDefault();resolve('skip')});
+// Pointer events provide touch/pen/mouse feedback; click alone performs actions.
+document.querySelectorAll('button').forEach(button=>{button.addEventListener('pointerdown',event=>{if(event.isPrimary&&!button.disabled)button.classList.add('pressed')});['pointerup','pointercancel','pointerleave','lostpointercapture','blur'].forEach(name=>button.addEventListener(name,()=>button.classList.remove('pressed')))});
+preview();
 </script></body></html>
